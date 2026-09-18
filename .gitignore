@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.vscode/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+.mtgwiki-cache.sqlite
+verify_output/
+mtgwiki_verify_report.json

@@ -1,8 +1,54 @@
-# mtgwiki 1.2.0
+# mtgwiki
 
-`mtgwiki` is a small Python package for getting **useful, reusable data** out of MediaWiki Action API sites without teaching the package what the wiki's subject matter means. MTG Wiki is the default endpoint and the original use case, but the transport, traversal, parsing and snapshot layers are domain-neutral.
+[![PyPI version](https://img.shields.io/pypi/v/mtgwiki.svg)](https://pypi.org/project/mtgwiki/)
+[![Python versions](https://img.shields.io/pypi/pyversions/mtgwiki.svg)](https://pypi.org/project/mtgwiki/)
+[![License: MIT](https://img.shields.io/pypi/l/mtgwiki.svg)](https://github.com/m0n0deaf/mtgwiki/blob/main/LICENSE)
+[![Publish to PyPI](https://github.com/m0n0deaf/mtgwiki/actions/workflows/release.yml/badge.svg)](https://github.com/m0n0deaf/mtgwiki/actions/workflows/release.yml)
 
-The package does **not** contain functions such as `get_plane()`, `get_character()`, `flora()` or `depicted_cards()`. Instead it exposes generic MediaWiki building blocks and a generic snapshot/structure layer that other projects can interpret however they want.
+`mtgwiki` is a lightweight Python package for getting **useful, reusable data** out of MediaWiki Action API sites without teaching the package what the wiki's subject matter means.
+
+MTG Wiki is the default endpoint and the original use case, but the transport, traversal, parsing and snapshot layers are domain-neutral.
+
+The package does **not** contain functions such as `get_plane()`, `get_character()`, `flora()` or `depicted_cards()`. Instead it exposes generic MediaWiki building blocks and a generic snapshot/structure layer that downstream projects can interpret however they want.
+
+## Installation
+
+```bash
+python -m pip install mtgwiki
+```
+
+Requires Python 3.10 or newer.
+
+## Quick start
+
+```python
+from mtgwiki import Wiki
+
+wiki = Wiki()
+
+page = wiki.get("Skyship Weatherlight")
+print(page["title"])
+
+hits = wiki.search("Bloomburrow", limit=20)
+for hit in hits:
+    print(hit["title"])
+```
+
+Search results are ranked search results. `search()` does not pretend the first result is the entity you meant.
+
+For category-based research, recursive traversal is built in:
+
+```python
+pages = wiki.members(
+    "Planeswalker characters",
+    recurse=True,
+    namespace=0,
+    cmtype="page",
+)
+
+for page in pages:
+    print(page["title"])
+```
 
 ## Design rule
 
@@ -14,15 +60,7 @@ The package has three jobs:
 2. **Structure** generic wiki syntax such as templates, parameters, sections, lists, tables and links.
 3. **Export** JSON-friendly snapshots that preserve source/provenance and raw data.
 
-## Install
-
-From the unpacked project folder:
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -e .
-```
+## User-Agent and other MediaWiki sites
 
 For sustained API use, identify your own project in the User-Agent:
 
@@ -43,28 +81,11 @@ wiki = Wiki(
 )
 ```
 
-The package name/default URL are conveniences; the public data model contains no Magic-specific entity types.
+The package name and default URL are conveniences; the public data model contains no Magic-specific entity types.
 
 ## Compatibility
 
 The client targets modern MediaWiki Action API installations and always requests JSON with `formatversion=2`. Revision-content handling supports main-slot responses and includes fallbacks for older response shapes. Rendered section discovery prefers `tocdata` and falls back to the older `sections` output. Use `siteinfo()` and `paraminfo()` when a consuming project needs to discover site-specific capabilities rather than assume them.
-
-## Quick start
-
-```python
-from mtgwiki import Wiki
-
-wiki = Wiki()
-
-page = wiki.get("Skyship Weatherlight")
-print(page["title"])
-
-hits = wiki.search("Bloomburrow", limit=20)
-for hit in hits:
-    print(hit["title"])
-```
-
-Search results are ranked search results. `search()` does not pretend the first result is the entity you meant.
 
 ## Generic structure discovery
 
@@ -387,15 +408,27 @@ The SQLite cache is optional and uses only Python's standard library.
 
 The 1.0 helpers `infobox()`, `infobox_fields()`, `templates_with_params()` and `template_params()` remain available so existing experiments keep working. New code should generally prefer `template_calls()` or `structure()` because those do not assume a particular template convention.
 
-## Tests
+## Development
 
-Offline unit tests:
+Clone the repository and install it in editable mode:
+
+```powershell
+git clone https://github.com/m0n0deaf/mtgwiki.git
+cd mtgwiki
+
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install -e .
+```
+
+Run the offline test suite:
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-Then run the supplied live verifier:
+Then run the optional live verifier against the configured MediaWiki endpoint:
 
 ```powershell
 python verify_live.py
@@ -408,4 +441,11 @@ mtgwiki_verify_report.json
 verify_output/pages.jsonl
 ```
 
-Send `mtgwiki_verify_report.json` back to ChatGPT if you want the live result reviewed.
+The report can be attached to bug reports or used when troubleshooting live-site compatibility.
+
+## Project links
+
+- PyPI: https://pypi.org/project/mtgwiki/
+- Source: https://github.com/m0n0deaf/mtgwiki
+- Issues: https://github.com/m0n0deaf/mtgwiki/issues
+- Changelog: https://github.com/m0n0deaf/mtgwiki/blob/main/CHANGELOG.md

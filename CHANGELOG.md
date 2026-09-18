@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.1
+
+Public package and documentation polish.
+
+- Updated the README for normal PyPI installation with `pip install mtgwiki`.
+- Separated end-user installation from editable development installation.
+- Added PyPI, Python, license and release-workflow badges.
+- Added public project, repository, issue tracker and changelog links.
+- Removed development-specific ChatGPT wording from the public documentation.
+- Refreshed package metadata for the public GitHub/PyPI project.
+- Expanded `.gitignore` for common Python tooling caches and mtgwiki SQLite sidecar files.
+
 ## 1.2.0
 
 Generic research ergonomics inspired by established MediaWiki clients.

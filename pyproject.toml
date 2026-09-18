@@ -4,19 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mtgwiki"
-version = "1.2.0"
-description = "A small, polite, data-oriented Python client for MediaWiki Action API sites"
+version = "1.2.1"
+description = "Lightweight Python client for MediaWiki research, parsing, caching, and structured data extraction."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "Martin Bräck"}]
 dependencies = ["requests>=2.31,<3"]
-keywords = ["mediawiki", "mtg", "magic-the-gathering", "api", "wikitext"]
+keywords = ["mediawiki", "wiki", "api", "wikitext", "research", "data-extraction"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
+
+[project.urls]
+Homepage = "https://github.com/m0n0deaf/mtgwiki"
+Repository = "https://github.com/m0n0deaf/mtgwiki"
+Issues = "https://github.com/m0n0deaf/mtgwiki/issues"
+Changelog = "https://github.com/m0n0deaf/mtgwiki/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

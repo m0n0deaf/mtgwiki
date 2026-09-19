@@ -11,6 +11,12 @@ MTG Wiki is the default endpoint and the original use case, but the transport, t
 
 The package does **not** contain functions such as `get_plane()`, `get_character()`, `flora()` or `depicted_cards()`. Instead it exposes generic MediaWiki building blocks and a generic snapshot/structure layer that downstream projects can interpret however they want.
 
+## Live showcase
+
+Explore real MediaWiki data extracted with mtgwiki:
+
+https://m0n0deaf.github.io/mtgwiki/
+
 ## Installation
 
 ```bash

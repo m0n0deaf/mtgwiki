@@ -45,6 +45,8 @@ def clean_wikitext(text: str, *, remove_templates: bool = False) -> str:
         spans = _template_spans(value)
         for span in sorted(spans, key=lambda item: item[0], reverse=True):
             start, end, _depth = span
+            if _depth != 1:
+                continue
             value = value[:start] + " " + value[end:]
 
     value = _TAG_RE.sub(" ", value)
@@ -377,6 +379,7 @@ def _split_top_level(text: str, separator: str) -> list[str]:
     if not separator:
         raise ValueError("separator must not be empty")
 
+    masked = _mask_protected(text)
     parts: list[str] = []
     start = 0
     template_depth = 0
@@ -385,27 +388,27 @@ def _split_top_level(text: str, separator: str) -> list[str]:
     i = 0
 
     while i < len(text):
-        if text.startswith("{{{", i):
+        if masked.startswith("{{{", i):
             argument_depth += 1
             i += 3
             continue
-        if text.startswith("{{", i):
+        if masked.startswith("{{", i):
             template_depth += 1
             i += 2
             continue
-        if text.startswith("}}}", i) and argument_depth:
+        if masked.startswith("}}}", i) and argument_depth:
             argument_depth -= 1
             i += 3
             continue
-        if text.startswith("}}", i) and template_depth:
+        if masked.startswith("}}", i) and template_depth:
             template_depth -= 1
             i += 2
             continue
-        if text.startswith("[[", i):
+        if masked.startswith("[[", i):
             link_depth += 1
             i += 2
             continue
-        if text.startswith("]]", i) and link_depth:
+        if masked.startswith("]]", i) and link_depth:
             link_depth -= 1
             i += 2
             continue
@@ -414,7 +417,7 @@ def _split_top_level(text: str, separator: str) -> list[str]:
             template_depth == 0
             and argument_depth == 0
             and link_depth == 0
-            and text.startswith(separator, i)
+            and masked.startswith(separator, i)
         ):
             parts.append(text[start:i])
             i += len(separator)

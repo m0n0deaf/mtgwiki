@@ -206,7 +206,10 @@ class Wiki:
             )
             params.update({"titles": "|".join(batch_titles), "redirects": 1})
             pages, meta = self._pages_bundle(**params)
-            result.extend(self._map_pages_to_requested(batch_titles, pages, meta))
+            result.extend(
+                None if page is not None and page.get("invalid") is True else page
+                for page in self._map_pages_to_requested(batch_titles, pages, meta)
+            )
 
         return result
 
@@ -734,7 +737,7 @@ class Wiki:
                 "raw": None,
             }
 
-        exists = page.get("missing") is not True
+        exists = page.get("missing") is not True and page.get("invalid") is not True
         revision = self._revision_metadata(page)
         content_raw = self._revision_content(page) if exists else None
         resolved_title = page.get("title")
@@ -963,7 +966,7 @@ class Wiki:
 
     @staticmethod
     def _title_key(value: Any) -> str:
-        return " ".join(str(value).replace("_", " ").split()).casefold()
+        return " ".join(str(value).replace("_", " ").split())
 
     @staticmethod
     def _page_key(page: dict[str, Any]) -> tuple[str, Any]:
@@ -987,9 +990,35 @@ class Wiki:
 
     @staticmethod
     def _extend_unique(target: list[Any], incoming: list[Any]) -> None:
+        def record_key(item: Any) -> Any:
+            # Preserve full equality, including metadata, for common flat API
+            # records. Nested/unknown shapes retain the equality-scan fallback.
+            if isinstance(item, dict) and all(
+                type(value) in (str, int, float, bool, type(None))
+                for value in item.values()
+            ):
+                return ("record", frozenset(item.items()))
+            if type(item) in (str, int, float, bool, type(None)):
+                return ("scalar", item)
+            return None
+
+        seen = set()
+        fallback = []
+        for item in target:
+            key = record_key(item)
+            if key is None:
+                fallback.append(item)
+            else:
+                seen.add(key)
         for item in incoming:
-            if item not in target:
+            key = record_key(item)
+            if key is None:
+                if item not in target:
+                    target.append(item)
+                    fallback.append(item)
+            elif key not in seen and item not in fallback:
                 target.append(item)
+                seen.add(key)
 
     @staticmethod
     def _parse_value(value: Any) -> Any:

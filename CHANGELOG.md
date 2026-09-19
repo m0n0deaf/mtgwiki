@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.2
+
+- Preserve case-sensitive MediaWiki title identities in lookups, redirects and category traversal.
+- Return `None` for invalid-title lookups and mark invalid snapshots as nonexistent while retaining raw API details.
+- Preserve remaining cache lifetime when promoting SQLite entries into memory.
+- Ignore protected comments and nowiki content when splitting template parameters, retaining raw values.
+- Remove nested templates without deleting surrounding prose.
+- Use hash-based deduplication for common property records while preserving order, metadata and fallback equality behavior.
+- Add focused offline regressions for these fixes and synchronize package/User-Agent versions.
+
 ## 1.2.1
 
 Public package and documentation polish.

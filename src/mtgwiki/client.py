@@ -14,7 +14,7 @@ import requests
 
 
 DEFAULT_API_URL = "https://mtg.wiki/api.php"
-DEFAULT_USER_AGENT = "mtgwiki/1.2.0"
+DEFAULT_USER_AGENT = "mtgwiki/1.2.2"
 
 
 class APIError(RuntimeError):
@@ -429,7 +429,7 @@ class Client:
             return None
 
         self._disk_cache_hits += 1
-        self._memory_cache_put(key, data)
+        self._memory_cache_put(key, data, ttl=max(0.0, float(expires) - time.time()))
         return copy.deepcopy(data)
 
     def _cache_put(self, key: str, data: Any) -> None:
@@ -447,8 +447,8 @@ class Client:
             )
             self._sqlite.commit()
 
-    def _memory_cache_put(self, key: str, data: Any) -> None:
-        expires_at = time.monotonic() + self.cache_ttl
+    def _memory_cache_put(self, key: str, data: Any, *, ttl: float | None = None) -> None:
+        expires_at = time.monotonic() + (self.cache_ttl if ttl is None else ttl)
         self._cache[key] = (expires_at, copy.deepcopy(data))
         self._cache.move_to_end(key)
 

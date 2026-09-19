@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore how mtgwiki turns MediaWiki pages into structured, traceable research data. A static Python package showcase.">
+  <meta name="color-scheme" content="dark">
+  <title>mtgwiki — MediaWiki data, ready for research</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar wrap">
+    <a class="brand" href="#"><span class="brand-icon" aria-hidden="true">{m}</span> mtgwiki</a>
+    <nav aria-label="Main navigation"><a href="#explorer">Explore the data</a><a href="https://github.com/m0n0deaf/mtgwiki">GitHub ↗</a></nav>
+  </header>
+  <main id="main" class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow"><span class="dot"></span> SMALL PYTHON PACKAGE · ANY MEDIAWIKI</p>
+        <h1 id="hero-title">MediaWiki data,<br><span>ready for research.</span></h1>
+        <p class="intro">From pages to datasets. Retrieve content, uncover wiki structure, and keep the source behind every finding.</p>
+        <div class="install"><code><span aria-hidden="true">$ </span>pip install mtgwiki</code><button id="copy-install" type="button">Copy</button></div>
+        <p class="subtle">Continuation, batching, retries, caching. Already handled.</p>
+        <a class="button" href="#explorer">Explore a real snapshot <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-demo">
+        <div class="panel code-panel"><div class="panel-label"><span class="dots" aria-hidden="true">● ● ●</span><span>research.py</span><span>PYTHON</span></div><pre><code><span class="syntax">from</span> mtgwiki <span class="syntax">import</span> Wiki
+
+wiki = Wiki()
+page = wiki.extract(<span class="string">"Urza"</span>)</code></pre></div>
+        <div class="pipeline" aria-label="Page to structure to dataset"><span>Wiki page</span><b aria-hidden="true">→</b><span>Structure</span><b aria-hidden="true">→</b><span>Dataset</span></div>
+        <div class="mini-output"><span class="eyebrow">ONE PORTABLE SNAPSHOT</span><div><code>source</code><code>content</code><code>data</code><code>structure</code></div><p>JSON-friendly. Source-preserving. Yours to interpret.</p></div>
+      </div>
+    </section>
+    <aside class="dataset-note"><span class="badge">EXAMPLE DATASET</span><p>Magic: The Gathering Wiki supplies the examples. <strong>mtgwiki works with unrelated MediaWiki sites too.</strong> This page reads saved JSON; browsing it makes no wiki API requests.</p></aside>
+    <p id="load-status" role="status">Loading the saved dataset…</p>
+    <noscript><p class="error">Enable JavaScript to explore the saved data, or <a href="./data/showcase.json">download the JSON dataset</a>.</p></noscript>
+
+    <section id="explorer" class="section" aria-labelledby="explorer-title">
+      <div class="section-heading"><div><p class="eyebrow">01 / ACQUIRE</p><h2 id="explorer-title">A page. Many layers of data.</h2><p>Choose a saved page to inspect its identity and connections.</p></div><div class="select-wrap"><label for="page-select">Example page</label><select id="page-select" disabled><option>Loading…</option></select></div></div>
+      <div id="snapshot" aria-live="polite"></div>
+      <details class="raw"><summary>Inspect the complete snapshot JSON</summary><p><a id="download-snapshot" href="./data/showcase.json" download>Download selected snapshot ↓</a></p><pre id="snapshot-json"></pre></details>
+    </section>
+
+    <section id="structure" class="section" aria-labelledby="structure-title">
+      <div class="section-heading"><div><p class="eyebrow">02 / STRUCTURE</p><h2 id="structure-title">Syntax in. Structure out.</h2><p>Template names and parameter values become fields you can work with.</p></div><span class="badge">NO DOMAIN ASSUMPTIONS</span></div>
+      <div class="structure-grid"><div class="panel"><div class="panel-label">RAW WIKITEXT <span>→</span></div><pre id="template-source"></pre><p class="panel-foot" id="template-label"></p></div><div class="panel"><div class="panel-label">PARSED TEMPLATE <code id="template-name"></code></div><div class="table-scroll"><table><thead><tr><th>Parameter</th><th>Raw value</th><th>Cleaned value</th></tr></thead><tbody id="parameters"></tbody></table></div></div></div>
+      <p class="callout">“species” and “spark” are just parameter names. <strong>mtgwiki extracts the structure; your research supplies the meaning.</strong> Raw values remain available beside cleaned conveniences.</p>
+    </section>
+
+    <section id="categories" class="section" aria-labelledby="category-title">
+      <div class="section-heading"><div><p class="eyebrow">03 / COLLECT</p><h2 id="category-title">Follow categories. Build a collection.</h2><p>Traverse subcategories with cycle protection and deduplicated results.</p></div></div>
+      <div class="category-grid"><div class="panel code-panel"><div class="panel-label">RECURSIVE CATEGORY QUERY</div><pre><code>wiki.members(
+    <span class="string">"Planeswalker characters"</span>,
+    recurse=<span class="syntax">True</span>,
+    namespace=<span class="number">0</span>,
+    cmtype=<span class="string">"page"</span>,
+)</code></pre><p class="panel-foot">A generic category graph → a list of article records.</p></div><div class="panel category-result"><p class="eyebrow">CATEGORY: PLANESWALKER CHARACTERS</p><div id="category-counts" class="counts"></div><div id="category-branches"></div></div></div>
+      <div class="member-preview"><p class="eyebrow">A FEW MEMBERS OF THE RECURSIVE RESULT</p><div id="category-members" class="chips"></div><p id="category-note" class="subtle"></p></div>
+    </section>
+
+    <section class="section" aria-labelledby="questions-title">
+      <div class="section-heading"><div><p class="eyebrow">04 / INVESTIGATE</p><h2 id="questions-title">Your next question starts here.</h2><p>Use the exported data in Python, a notebook, or your own analysis pipeline.</p></div></div>
+      <div class="questions"><article><span class="question-icon" aria-hidden="true">{ }</span><h3>Discover a schema</h3><p>Which template fields occur across a collection of pages?</p><code>structure.templates → params</code></article><article><span class="question-icon" aria-hidden="true">∩</span><h3>Compare collections</h3><p>Which categories overlap, and which pages belong to both?</p><code>data.categories</code></article><article><span class="question-icon" aria-hidden="true">≡</span><h3>Survey values</h3><p>What values occur in a given template parameter?</p><code>params → params_clean</code></article><article><span class="question-icon" aria-hidden="true">↗</span><h3>Trace connections</h3><p>How are pages connected through links or categories?</p><code>data.links + data.categories</code></article></div>
+      <p class="subtle">Research directions, not built-in interpretations or computed conclusions.</p>
+    </section>
+
+    <section id="provenance" class="section" aria-labelledby="provenance-title">
+      <div class="section-heading"><div><p class="eyebrow">05 / TRACE</p><h2 id="provenance-title">Keep the evidence attached.</h2><p>Every selected snapshot carries its source and revision metadata.</p></div><span class="badge">SOURCE → REVISION → EXPORT</span></div>
+      <div class="panel provenance-panel"><dl id="provenance-fields"></dl><div class="provenance-aside"><h3>A finding with a paper trail.</h3><p>Know which page you asked for, which page it resolved to, and when its recorded revision was saved.</p><p>The retrieval timestamp records acquisition; the revision timestamp records the wiki edit. Related properties reflect the API response at retrieval, not a historical revision lock.</p><a id="revision-link" href="https://mtg.wiki">View the recorded revision ↗</a></div></div>
+    </section>
+    <section class="closing"><p class="eyebrow">SMALL LIBRARY. OPEN-ENDED RESEARCH.</p><h2>Bring your own wiki.<br>Ask your own questions.</h2><p>Change the API endpoint. Keep the same tools.</p><pre><code>Wiki(api_url="https://www.mediawiki.org/w/api.php")</code></pre><div class="links"><a class="button" href="https://github.com/m0n0deaf/mtgwiki">GitHub repository ↗</a><a href="https://pypi.org/project/mtgwiki/">PyPI ↗</a><a href="https://github.com/m0n0deaf/mtgwiki/blob/main/README.md">Read the README ↗</a></div></section>
+  </main>
+  <footer class="wrap"><div><a class="brand" href="#">{m} mtgwiki</a><p>Independent package showcase. No card artwork. No live API calls.</p></div><div><p id="data-credit">Example content: <a href="https://mtg.wiki">MTG Wiki contributors</a>.</p><p id="build-date"></p><a href="./data/showcase.json" download>Download the saved dataset ↓</a></div></footer>
+</body>
+</html>

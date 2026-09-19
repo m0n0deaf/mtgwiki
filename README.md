@@ -15,7 +15,7 @@ The package does **not** contain functions such as `get_plane()`, `get_character
 
 Explore real MediaWiki data extracted with mtgwiki:
 
-https://m0n0deaf.github.io/mtgwiki/
+[Open the mtgwiki showcase](https://m0n0deaf.github.io/mtgwiki/)
 
 ## Installation
 
